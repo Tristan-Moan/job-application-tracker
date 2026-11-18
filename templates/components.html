@@ -1,0 +1,33 @@
+{% macro table(kind, rows) %}
+    {% if rows %}
+        <div class="scroll">
+            <table>
+                <thead>
+                    <tr>
+                        {% for key in columns[kind] %}
+                            <th>{{ labels[key] }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                        <tr>
+                            {% for key in columns[kind] %}
+                                <td>
+                                    {% if loop.first %}
+                                        <a href="{{ url_for('detail',kind=kind,rid=row[singular[kind] ~ '_id']) }}">{{ row[key] }}</a>
+                                    {% elif key == "status" %}
+                                        <span class="pill {{ row.status|lower }}">{{ row.status }}</span>
+                                    {% else %}
+                                        {{ row[key] or '∙' }}{% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty">No {{ kind }} yet. <a href="{{ url_for('form',kind=kind) }}">Add {{ 'an' if kind == 'applications' else 'a' }} {{ singular[kind] }}</a>.</div>
+    {% endif %}
+{% endmacro %}
