@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}
+    {{ row[columns[kind][0]] }}{% endblock %}
+{% block content %}
+    <a href="{{ url_for('listing',kind=kind) }}">‹ All {{ kind }}</a>
+    <header>
+        <div>
+            <h1>{{ self.title() }}</h1>
+            <p>{{ singular[kind]|capitalize }} details</p>
+        </div>
+        <div class="actions">
+            <a class="secondary" href="{{ url_for('remove',kind=kind,rid=rid) }}">Delete</a>
+            <a class="button" href="{{ url_for('form',kind=kind,rid=rid) }}">Edit {{ singular[kind] }}</a>
+        </div>
+    </header>
+    <dl class="panel details">
+        {% for f in fields %}
+            <div>
+                <dt>{{ f.label }}</dt>
+                <dd>
+                    {% set v = row[f.key] %}
+                    {% if f.kind == "checkbox" %}
+                        {{ 'Yes' if v else 'No' }}{% elif f.kind in ("companies","jobs") %}
+                        <a href="{{ url_for('detail',kind=f.kind,rid=v) }}">{{ row.company_name if f.kind == 'companies' else row.job_title ~ ' / ' ~ row.company_name }}</a>
+                    {% elif f.kind == "skills" and v %}
+                        {% for item in v|from_json %}
+                            <span class="chip">{{ item }}</span>
+                    {% else %}No skills listed{% endfor %}
+                    {% elif f.kind == "json" and v %}
+                        <pre>{{ v|from_json|tojson(indent=2) }}</pre>
+                    {% elif f.kind == "url" and v %}
+                        <a href="{{ v }}">{{ v }}</a>
+                    {% elif v is none or v == "" %}Unspecified{% elif f.key == "status" %}
+                        <span class="pill {{ v|lower }}">{{ v }}</span>
+                    {% elif f.kind == "textarea" %}
+                        <span class="notes">{{ v }}</span>
+                    {% elif f.kind == "number" %}${{ '{:,}'.format(v) }}{% else %}
+                        {{ v }}{% endif %}
+                </dd>
+            </div>
+        {% endfor %}
+    </dl>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% from 'components.html' import table with context %}
+{% block content %}
+    <header>
+        <div>
+            <h1>Dashboard</h1>
+            <p>Your job search at a glance.</p>
+        </div>
+        <a class="button" href="{{ url_for('form',kind='applications') }}">+ Add application</a>
+    </header>
+    <section class="stats" aria-label="Record totals">
+        {% for key in ['applications','jobs','companies','contacts'] %}
+            <a href="{{ url_for('listing',kind=key) }}">
+                <span>{{ key|capitalize }}</span>
+                <strong>{{ counts[key] }}</strong></a>
+        {% endfor %}
+    </section>
+    <section class="panel">
+        <div class="sectionhead">
+            <h2>Application pipeline</h2>
+            <small>By current status</small>
+        </div>
+        <div class="stages">
+            {% for stage in stages %}
+                <div>
+                    <i class="{{ stage|lower }}">
+                    </i>
+                    <span>{{ stage }}</span>
+                    <strong>{{ pipeline.get(stage,0) }}</strong>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+    <section class="panel">
+        <div class="sectionhead">
+            <h2>Recent applications</h2>
+            <a href="{{ url_for('listing',kind='applications') }}">View all ›</a>
+        </div>
+        {{ table('applications',recent) }}
+    </section>
+{% endblock %}
